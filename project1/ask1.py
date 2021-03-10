@@ -1,32 +1,43 @@
 string = ""
 with open('R_sorted.tsv') as R, open('S_sorted.tsv') as S:
-    R_lines = R.read().split('\n')[:-1]
-    S_lines = S.read().split('\n')[:-1]
-    pointer = 0
-    mark = -1 #not set
-
-    for i, line in enumerate(R_lines):
-        R = line.split("\t");
+    R_line = R.readline().rstrip()
+    S_line = S.readline().rstrip()
+    buffer = []
+    maxBuffer = 0
+    tmp = None
+    
+    while R_line:
+        if(tmp == R_line.split('\t')[0]):
+            for i in buffer:
+                string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\t' + i.split('\t')[1] + '\n'
+                print(R_line.split('\t')[0], R_line.split('\t')[1], i.split('\t')[1])
+            pass
+        else:
+            if(len(buffer) > maxBuffer):
+                maxBuffer = len(buffer)
+            buffer = []
         
-        if(mark == -1): #not set
-            if(R[0] < S_lines[pointer].split("\t")[0]):
-                pass
-            while(R[0] > S_lines[pointer].split("\t")[0]):
-                pointer += 1
-            mark = pointer
+        while(R_line.split('\t')[0] > S_line.split('\t')[0]):
+            S_line = S.readline().rstrip()
+            if(S_line == ""):
+                break
+        
+        if(R_line.split('\t')[0] < S_line.split('\t')[0]):
+            pass
+        
+        if(R_line.split('\t')[0] == S_line.split('\t')[0]):
+            while(R_line.split('\t')[0] == S_line.split('\t')[0]):
+                buffer.append(S_line)
+                S_line = S.readline().rstrip()
+            for i in buffer:
+                string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\t' + i.split('\t')[1] + '\n'
+                print(R_line.split('\t')[0], R_line.split('\t')[1], i.split('\t')[1])
+            tmp = R_line.split('\t')[0]
 
-        if(R[0] == S_lines[pointer].split("\t")[0]):
-            while(R[0] == S_lines[pointer].split("\t")[0]):
-                string = string + R[0] + "\t" + R[1] + "\t" + S_lines[pointer].split("\t")[1] + "\n"
-                print(R[0], R[1], S_lines[pointer].split("\t")[1])
-                pointer += 1
-            pointer = mark
-
-        if(i+1 < len(R_lines)):
-            if(R[0] != R_lines[i+1].split("\t")[0]):
-                pointer = mark
-                mark = -1
+        R_line = R.readline().rstrip()
 
 f = open("RjoinS.tsv", "w")
 f.write(string)
 f.close()
+
+print("Max buffer size:", maxBuffer)
