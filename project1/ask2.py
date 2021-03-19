@@ -7,6 +7,7 @@ with open('R_sorted.tsv') as R, open('S_sorted.tsv') as S:
     while R_line:
         while(R_line != "" and R_line.split('\t')[0] < S_line.split('\t')[0]):
             if(tmp != R_line):
+                string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\n'
                 print(R_line.split('\t')[0], R_line.split('\t')[1])
             tmp = R_line
             R_line = R.readline().rstrip()
@@ -14,6 +15,7 @@ with open('R_sorted.tsv') as R, open('S_sorted.tsv') as S:
     
         while(S_line != "" and R_line.split('\t')[0] > S_line.split('\t')[0]):
             if(tmp != S_line):
+                string += S_line.split('\t')[0] + '\t' + S_line.split('\t')[1] + '\n'
                 print(S_line.split('\t')[0], S_line.split('\t')[1])
             tmp = S_line
             S_line = S.readline().rstrip()
@@ -22,28 +24,33 @@ with open('R_sorted.tsv') as R, open('S_sorted.tsv') as S:
             while(R_line.split('\t')[0] == S_line.split('\t')[0]):
                 if(R_line.split('\t')[1] < S_line.split('\t')[1]):
                     if(tmp != R_line):
+                        string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\n'
                         print(R_line.split('\t')[0], R_line.split('\t')[1])
                     tmp = R_line
                     R_line = R.readline().rstrip()
                 else:
                     if(tmp != S_line):
+                        string += S_line.split('\t')[0] + '\t' + S_line.split('\t')[1] + '\n'
                         print(S_line.split('\t')[0], S_line.split('\t')[1])
                     tmp = S_line
                     S_line = S.readline().rstrip()
             if(R_line.split('\t')[0] < S_line.split('\t')[0]):
                 if(tmp != R_line and R_line != ""):
+                    string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\n'
                     print(R_line.split('\t')[0], R_line.split('\t')[1])
                 tmp = R_line
         
         if(R_line == ""): #print rest of S
             while(S_line):
                 if(tmp != S_line):
+                    string += S_line.split('\t')[0] + '\t' + S_line.split('\t')[1] + '\n'
                     print(S_line.split('\t')[0], S_line.split('\t')[1])
                 tmp = S_line
                 S_line = S.readline().rstrip()
         elif(S_line == ""): #print rest of R
             while(R_line):
                 if(tmp != R_line):
+                    string += R_line.split('\t')[0] + '\t' + R_line.split('\t')[1] + '\n'
                     print(R_line.split('\t')[0], R_line.split('\t')[1])
                 tmp = R_line
                 R_line = R.readline().rstrip()
