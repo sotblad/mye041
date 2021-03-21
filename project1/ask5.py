@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 def mergeSort(list):
     i = 0
     j = 0
