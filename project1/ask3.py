@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 string = ""
 with open('R_sorted.tsv') as R, open('S_sorted.tsv') as S:
     R_line = R.readline().rstrip()
