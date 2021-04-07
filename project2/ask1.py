@@ -1,4 +1,3 @@
-
 import sys
 import pymorton as pm
 
@@ -10,7 +9,7 @@ from matplotlib.patches import Rectangle
 import matplotlib.patches as patches
 
 def drawPlot(lst):
-    data = np.array(lst)
+    data = np.array(lst[1])
     x, y = list(zip(*data))
 
     #### Rectangle #####
@@ -32,10 +31,10 @@ def drawPlot(lst):
 ####end draw
 
 def MBR(points):
-    x_low = min(point[0] for point in points)
-    y_low = min(point[1] for point in points)
-    x_high = max(point[0] for point in points)
-    y_high = max(point[1] for point in points)
+    x_low = min(point[0] for point in points[1])
+    y_low = min(point[1] for point in points[1])
+    x_high = max(point[0] for point in points[1])
+    y_high = max(point[1] for point in points[1])
 
     return [x_low, x_high, y_low, y_high]
 
@@ -68,8 +67,8 @@ def createLeaves(lst):
     maxPerLeaf = 20
     clean = 0
     count = 0
-    for i in range(0, len(sortedMBR)):
-        leaf.append(sortedMBR[i][1])
+    for i in range(0, len(lst)):
+        leaf.append(lst[i][1])
         count += 1
         
         if(count == maxPerLeaf):
@@ -77,7 +76,7 @@ def createLeaves(lst):
             leaves.append(leaf)
             clean = 1
             
-        if(i == len(sortedMBR)-1): # LAST LEAF
+        if(i == len(lst)-1): # LAST LEAF
             if(len(leaf) < maxPerLeaf*0.4):
                 theloume = int(maxPerLeaf*0.4-len(leaf))
 
@@ -95,16 +94,23 @@ def createLeaves(lst):
 def toNormalMBR(lst):
     tempList = []
     for i in range(0, len(lst)):
+        print(lst[i] , "XOEORORAROROOARA")
         tempList.append([lst[i][1][0], lst[i][1][2], lst[i][1][1], lst[i][1][3]])
-    return MBR(tempList)
+       # print(lst[i] , "XOEORORAROROOARA")
+    return MBR([-1, [tempList]])
     
-def createTree(leaves, res):
+def createTree(leaves, initialize):
+    if(len(leaves) == 1):
+        return -100
     layer = []
     realLayer = []
     
     result = []
     for i in range(0, len(leaves)):
-        result.append(toNormalMBR(leaves[i]))
+        if(initialize == 0):
+            result.append(toNormalMBR(leaves[i]))
+        else:
+            result.append(toNormalMBR(leaves))
         
     isnotleaf = 1
     count = 0
@@ -112,7 +118,7 @@ def createTree(leaves, res):
     clean = 0
     realLayerFinal=[]
     for i in range(0, len(result)):
-        layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
+        layer.append([isnotleaf, i, result[i]])
         count += 1
         
         if(count == maxPerLeaf):
@@ -134,13 +140,18 @@ def createTree(leaves, res):
             clean = 0
             layer = []
         
-        
-        
+    if(initialize):
+        realLayerFinal.append(leaves)
     realLayerFinal.append(realLayer)
-    
-    realLayerFinal.append(leaves)
-        
-    return realLayer
+
+    while 1:
+        print(realLayerFinal)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        value = createTree(realLayerFinal[0], 0)
+        if(value == -100):
+            print("HI")
+   # print("XAXAXAXAXAAXXAXAXAXA")
+    return realLayerFinal
 
 
 if(len(sys.argv) <= 2 or len(sys.argv) > 3):
@@ -171,18 +182,29 @@ for i in offset_list:
             flag = 1
     if(flag): #and test < 2821):
         #test += 1
-        objects.append(objTemp)
-    print(objTemp)
+        objects.append([int(i.split(',')[0]), objTemp])
     
+#######✅ OBJECTS CREATION
+#######✅ MBR SINGLE CALCULATION
+#######✅ MBR MULTIPLE CALCULATION
+#######✅ calcZOrder    -- TODO: CHECK IF ID IS NEEDED
+#######✅ sortMBR FULL method
+
+
 #data = np.array([item for sublist in synt for item in sublist])
 
 #print(sorted(calcZOrder(calculateMBR(objects)), key=lambda x: int(x[0])))
 
 #drawPlot(objects[191])
-#sortedMBR = sortMBR(objects)
+sortedMBR = sortMBR(objects)
 #print(sortedMBR) # MBR gia kathe antikeimeno
-    
-#print(objects[1])
+
+#print(objects)
+leaves = createLeaves(sortedMBR)
+#print(createLeaves(sortedMBR))
+print(len(createTree(leaves, 1)[0]))
+
+#print(MBR(objects[1]))
 #print(len(leaves[len(leaves)-1]))
 #print(len(leaf[num:len(leaf)]))
     
