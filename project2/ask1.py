@@ -224,7 +224,7 @@ def writeRtree(fullTree):
                         else:
                             string += str([nodeid, fullTree[i][j][k][2]])
                         nodeid += 1
-                    string += "],"
+                    string += "]],"
                 else:
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
@@ -232,8 +232,7 @@ def writeRtree(fullTree):
                         else:
                             string += str([nodeid, fullTree[i][j][k][2]])
                         nodeid += 1
-                    string += "]"
-                string += "]"
+                    string += "]]"
             nodeId += 1
         if(i != len(fullTree)-1):
             string += "],\n["
@@ -278,16 +277,12 @@ for i in offset_list:
 #drawPlot(objects[1000])
 
 sortedMBR = sortMBR(objects)
-
 leaves = createLeaves(sortedMBR)
 firstSecondLayer = createTree(leaves)
-
 fullTree = finishUp(firstSecondLayer)
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
-    
-print(fullTree[2][0][0])
 
 f = open("Rtree.txt", "w")
 f.write(writeRtree(fullTree))
