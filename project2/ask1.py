@@ -30,7 +30,6 @@ def drawPlot(lst):
 ####end draw
 
 def MBR(points):
-   # print(points)
     x_low = min(point[0] for point in points[1])
     y_low = min(point[1] for point in points[1])
     x_high = max(point[0] for point in points[1])
@@ -40,13 +39,24 @@ def MBR(points):
     
     
 def MBR2(points):
-   # print(points)
     x_low = min(point[0] for point in points)
     y_low = min(point[2] for point in points)
     x_high = max(point[1] for point in points)
     y_high = max(point[3] for point in points)
 
     return [x_low, x_high, y_low, y_high]
+    
+def toNormalMBR(lst):
+    tempList = []
+    for i in range(0, len(lst)):
+        tempList.append(lst[i])
+    return MBR2(tempList)
+
+def toNormalMBR2(lst):   ### FOR FINISHUP
+    tempList = []
+    for i in range(0, len(lst)):
+        tempList.append(lst[i][2])
+    return MBR2(tempList)
         
 def calculateMBR(lst): # MBR gia kathe antikeimeno
     result = []
@@ -57,11 +67,9 @@ def calculateMBR(lst): # MBR gia kathe antikeimeno
     
 def calcZOrder(lst): # lst = calculateMBR output
     result = []
-    id = 0
     for i in lst:
         x , y = ((i[0]+i[1])/2) , ((i[2]+i[3])/2)
-        result.append([pm.interleave_latlng(x,y), [id, i]])
-        id += 1
+        result.append([pm.interleave_latlng(x,y),i])
     
     return result # [center z-order, [id, MBR]]
     
@@ -100,19 +108,6 @@ def createLeaves(lst):
             clean = 0
             leaf = []
     return leaves
-    
-def toNormalMBR(lst):
-    tempList = []
-    for i in range(0, len(lst)):
-        tempList.append(lst[i][1])
-    #print(tempList)
-    return MBR2(tempList)
-
-def toNormalMBR2(lst):   ### FOR FINISHUP
-    tempList = []
-    for i in range(0, len(lst)):
-        tempList.append(lst[i][2])
-    return MBR2(tempList)
     
 def createTree(leaves):
     layer = []
@@ -160,7 +155,7 @@ def finishUp(lst):
     result = []
     
     counter = 0
-
+    nodeNum = 0
     while(len(lst[len(lst)-1]) != 1):
         layer = []
         realLayer = []
@@ -175,7 +170,7 @@ def finishUp(lst):
             result.append(toNormalMBR2(lst[len(lst)-1][i]))
 
         for i in range(0, len(result)):
-            layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
+            layer.append([isnotleaf, nodeNum, result[i]]) # TODO: PAKETARE SE 20DES
             count += 1
             if(count == maxPerLeaf):
                 count = 0;
@@ -189,14 +184,15 @@ def finishUp(lst):
                     if(len(realLayer) != 0):
                         proigoumeno = realLayer[len(realLayer)-1][int(len(realLayer[len(realLayer)-1])-theloume):len(realLayer[len(realLayer)-1])]
                         realLayer[len(realLayer)-1] = realLayer[len(realLayer)-1][0:int(len(realLayer[len(realLayer)-1])-theloume)]
-                    
-                    layer = proigoumeno+layer
+                        
+                        layer = proigoumeno+layer
                     realLayer.append(layer)
                     
             if(clean == 1):
                 clean = 0
                 layer = []
-                
+            nodeNum += 1
+        nodeNum = 0
         realLayerFinal.append(realLayer)
         counter += 1
         
@@ -205,7 +201,11 @@ def finishUp(lst):
     return lst
     
 def writeRtree(fullTree):
+    string = ""
+
+    nodeId = 0
     string += "[["
+    nodeid = 0
     for i in range(0, len(fullTree)):
         for j in range(0, len(fullTree[i])):
             if(i == 0):
@@ -215,25 +215,31 @@ def writeRtree(fullTree):
                 else:
                     string += str([isnonleaf, nodeId, fullTree[i][j]])
             else:
-                string += "["
+                string += "[" + str(isnonleaf) + ", " + str(nodeId) + ", ["
                 isnonleaf = 1
                 if(j != len(fullTree[i])-1):
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
-                            string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]]) + ", "
+                            string += str([nodeid, fullTree[i][j][k][2]]) + ", "
                         else:
-                            string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]])
+                            string += str([nodeid, fullTree[i][j][k][2]])
+                        nodeid += 1
                     string += "],"
                 else:
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
-                            string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]]) + ", "
+                            string += str([nodeid, fullTree[i][j][k][2]]) + ", "
                         else:
-                            string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]])
+                            string += str([nodeid, fullTree[i][j][k][2]])
+                        nodeid += 1
                     string += "]"
+                string += "]"
             nodeId += 1
         if(i != len(fullTree)-1):
             string += "],\n["
+
+    string += "]]"
+    return string
 
 
 if(len(sys.argv) <= 2 or len(sys.argv) > 3):
@@ -280,49 +286,9 @@ fullTree = finishUp(firstSecondLayer)
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
-
-
-
-string = ""
-
-nodeId = 0
-string += "[["
-for i in range(0, len(fullTree)):
-    for j in range(0, len(fullTree[i])):
-        if(i == 0):
-            isnonleaf = 0
-            if(j != len(fullTree[i])-1):
-                string += str([isnonleaf, nodeId, fullTree[i][j]]) + ", "
-            else:
-                string += str([isnonleaf, nodeId, fullTree[i][j]])
-        else:
-            string += "["
-            isnonleaf = 1
-            if(j != len(fullTree[i])-1):
-                for k in range(0, len(fullTree[i][j])):
-                    if(k != len(fullTree[i][j])-1):
-                        string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]]) + ", "
-                    else:
-                        string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]])
-                string += "],"
-            else:
-                for k in range(0, len(fullTree[i][j])):
-                    if(k != len(fullTree[i][j])-1):
-                        string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]]) + ", "
-                    else:
-                        string += str([isnonleaf, nodeId, [fullTree[i][j][k][2]]])
-                string += "]"
-        nodeId += 1
-    if(i != len(fullTree)-1):
-        string += "],\n["
-
-string += "]]"
-
-#print(fullTree[0][len(fullTree[0])-1])
-
-#tmpList = [MBR(objects[1])] + [MBR(objects[1000])] + [MBR(objects[4500])]
-#print(MBR2(tmpList))
+    
+print(fullTree[2][0][0])
 
 f = open("Rtree.txt", "w")
-f.write(string)
+f.write(writeRtree(fullTree))
 f.close()
