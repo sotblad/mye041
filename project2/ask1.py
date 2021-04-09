@@ -30,13 +30,24 @@ def drawPlot(lst):
 ####end draw
 
 def MBR(points):
+   # print(points)
     x_low = min(point[0] for point in points[1])
     y_low = min(point[1] for point in points[1])
     x_high = max(point[0] for point in points[1])
     y_high = max(point[1] for point in points[1])
 
     return [x_low, x_high, y_low, y_high]
+    
+    
+def MBR2(points):
+   # print(points)
+    x_low = min(point[0] for point in points)
+    y_low = min(point[2] for point in points)
+    x_high = max(point[1] for point in points)
+    y_high = max(point[3] for point in points)
 
+    return [x_low, x_high, y_low, y_high]
+        
 def calculateMBR(lst): # MBR gia kathe antikeimeno
     result = []
     for i in lst:
@@ -93,14 +104,15 @@ def createLeaves(lst):
 def toNormalMBR(lst):
     tempList = []
     for i in range(0, len(lst)):
-        tempList.append([[lst[i][1][0], lst[i][1][2]], [lst[i][1][1], lst[i][1][3]]])
-    return MBR([-1, tempList[0]])
+        tempList.append(lst[i][1])
+    #print(tempList)
+    return MBR2(tempList)
 
 def toNormalMBR2(lst):   ### FOR FINISHUP
     tempList = []
     for i in range(0, len(lst)):
-        tempList.append([[lst[i][2][0], lst[i][2][2]], [lst[i][2][1], lst[i][2][3]]])
-    return MBR([-1, tempList[0]])
+        tempList.append(lst[i][2])
+    return MBR2(tempList)
     
 def createTree(leaves):
     layer = []
@@ -147,7 +159,6 @@ def createTree(leaves):
 def finishUp(lst):
     result = []
     
-    fortime = 1
     counter = 0
 
     while(len(lst[len(lst)-1]) != 1):
@@ -163,8 +174,6 @@ def finishUp(lst):
         for i in range(0, len(lst[len(lst)-1])):
             result.append(toNormalMBR2(lst[len(lst)-1][i]))
 
-
-        
         for i in range(0, len(result)):
             layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
             count += 1
@@ -192,7 +201,6 @@ def finishUp(lst):
         counter += 1
         
         lst.append(realLayerFinal[0])
-        
     
     return lst
     
@@ -274,7 +282,7 @@ for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
 
 
-    
+
 string = ""
 
 nodeId = 0
@@ -310,7 +318,10 @@ for i in range(0, len(fullTree)):
 
 string += "]]"
 
-print(fullTree[0][0])
+#print(fullTree[0][len(fullTree[0])-1])
+
+#tmpList = [MBR(objects[1])] + [MBR(objects[1000])] + [MBR(objects[4500])]
+#print(MBR2(tmpList))
 
 f = open("Rtree.txt", "w")
 f.write(string)
