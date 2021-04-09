@@ -37,7 +37,6 @@ def MBR(points):
 
     return [x_low, x_high, y_low, y_high]
     
-    
 def MBR2(points):
     x_low = min(point[0] for point in points)
     y_low = min(point[2] for point in points)
@@ -49,7 +48,7 @@ def MBR2(points):
 def toNormalMBR(lst):
     tempList = []
     for i in range(0, len(lst)):
-        tempList.append(lst[i])
+        tempList.append(lst[i][1])
     return MBR2(tempList)
 
 def toNormalMBR2(lst):   ### FOR FINISHUP
@@ -67,9 +66,11 @@ def calculateMBR(lst): # MBR gia kathe antikeimeno
     
 def calcZOrder(lst): # lst = calculateMBR output
     result = []
+    id = 0
     for i in lst:
         x , y = ((i[0]+i[1])/2) , ((i[2]+i[3])/2)
-        result.append([pm.interleave_latlng(x,y),i])
+        result.append([pm.interleave_latlng(x,y), [id, i]])
+        id += 1
     
     return result # [center z-order, [id, MBR]]
     
@@ -79,43 +80,16 @@ def sortMBR(lst):
     result = sorted(ZorderList, key=lambda x: x[0])
     return result
     
-def createLeaves(lst):
-    leaves = []
-    leaf = []
-    maxPerLeaf = 20
-    clean = 0
-    count = 0
-    for i in range(0, len(lst)):
-        leaf.append(lst[i][1])
-        count += 1
-        
-        if(count == maxPerLeaf):
-            count = 0;
-            leaves.append(leaf)
-            clean = 1
-            
-        if(i == len(lst)-1): # LAST LEAF
-            if(len(leaf) < maxPerLeaf*0.4):
-                theloume = int(maxPerLeaf*0.4-len(leaf))
-
-                proigoumeno = leaves[len(leaves)-1][int(len(leaves[len(leaves)-1])-theloume):len(leaves[len(leaves)-1])]
-                leaves[len(leaves)-1] = leaves[len(leaves)-1][0:int(len(leaves[len(leaves)-1])-theloume)]
-                
-                leaf = proigoumeno+leaf
-                leaves.append(leaf)
-            
-        if(clean == 1):
-            clean = 0
-            leaf = []
-    return leaves
-    
-def createTree(leaves):
+def create(leaves, mode): # 0 for leaves, 1 for level 1
     layer = []
     realLayer = []
     
     result = []
-    for i in range(0, len(leaves)):
-        result.append(toNormalMBR(leaves[i]))
+    if(mode == 1):
+        for i in range(0, len(leaves)):
+            result.append(toNormalMBR(leaves[i]))
+    else:
+        result = leaves
         
     isnotleaf = 1
     count = 0
@@ -123,7 +97,10 @@ def createTree(leaves):
     clean = 0
     realLayerFinal=[]
     for i in range(0, len(result)):
-        layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
+        if(mode == 1):
+            layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
+        else:
+            layer.append(leaves[i][1])
         count += 1
         
         if(count == maxPerLeaf):
@@ -145,10 +122,13 @@ def createTree(leaves):
             clean = 0
             layer = []
         
-    realLayerFinal.append(leaves)
-    realLayerFinal.append(realLayer)
+    if(mode == 1):
+        realLayerFinal.append(leaves)
+        realLayerFinal.append(realLayer)
 
-    return realLayerFinal
+        return realLayerFinal
+    else:
+        return realLayer
     
     
 def finishUp(lst):
@@ -277,12 +257,14 @@ for i in offset_list:
 #drawPlot(objects[1000])
 
 sortedMBR = sortMBR(objects)
-leaves = createLeaves(sortedMBR)
-firstSecondLayer = createTree(leaves)
-fullTree = finishUp(firstSecondLayer)
+leaves = create(sortedMBR, 0) #0 for Leaves
+firstSecondLayer = create(leaves, 1) # 1 for 1st layer
+fullTree = finishUp(firstSecondLayer) # continue
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
+    
+print(fullTree[0])
 
 f = open("Rtree.txt", "w")
 f.write(writeRtree(fullTree))
