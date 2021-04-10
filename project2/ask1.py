@@ -184,7 +184,7 @@ def writeRtree(fullTree):
     string = ""
 
     nodeId = 0
-    string += "[["
+    string += "["
     nodeid = 0
     for i in range(0, len(fullTree)):
         for j in range(0, len(fullTree[i])):
@@ -195,8 +195,8 @@ def writeRtree(fullTree):
                 else:
                     string += str([isnonleaf, nodeId, fullTree[i][j]])
             else:
-                string += "[" + str(isnonleaf) + ", " + str(nodeId) + ", ["
                 isnonleaf = 1
+                string += "[" + str(isnonleaf) + ", " + str(nodeId) + ", ["
                 if(j != len(fullTree[i])-1):
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
@@ -215,9 +215,9 @@ def writeRtree(fullTree):
                     string += "]]"
             nodeId += 1
         if(i != len(fullTree)-1):
-            string += "],\n["
+            string += ",\n"
 
-    string += "]]"
+    string += "]"
     return string
 
 
@@ -263,8 +263,6 @@ fullTree = finishUp(firstSecondLayer) # continue
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
-    
-print(fullTree[0])
 
 f = open("Rtree.txt", "w")
 f.write(writeRtree(fullTree))
