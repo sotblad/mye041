@@ -1,34 +1,6 @@
 import sys
 import pymorton as pm
 
-####start draw
-import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.patches import Rectangle
-import matplotlib.patches as patches
-
-def drawPlot(lst):
-    data = np.array(lst[1])
-    x, y = list(zip(*data))
-
-    #### Rectangle #####
-    currentAxis = plt.gca()
-    currentAxis.add_patch(
-        patches.Rectangle(
-            xy=(MBR(lst)[0], MBR(lst)[2]),
-            width=MBR(lst)[1] - MBR(lst)[0],
-            height=MBR(lst)[3] - MBR(lst)[2],
-            linewidth=1,
-            color='red',
-            fill=False
-        )
-    )
-
-    plt.scatter(x,y)
-    plt.show()
-
-####end draw
-
 def MBR(points):
     x_low = min(point[0] for point in points[1])
     y_low = min(point[1] for point in points[1])
@@ -150,7 +122,7 @@ def finishUp(lst):
             result.append(toNormalMBR2(lst[len(lst)-1][i]))
 
         for i in range(0, len(result)):
-            layer.append([isnotleaf, nodeNum, result[i]]) # TODO: PAKETARE SE 20DES
+            layer.append([isnotleaf, nodeNum+lst[len(lst)-1][len(lst[len(lst)-1])-1][len(lst[len(lst)-1][len(lst[len(lst)-1])-1])-1][1]+1, result[i]]) # TODO: PAKETARE SE 20DES
             count += 1
             if(count == maxPerLeaf):
                 count = 0;
@@ -191,7 +163,7 @@ def writeRtree(fullTree):
             if(i == 0):
                 isnonleaf = 0
                 if(j != len(fullTree[i])-1):
-                    string += str([isnonleaf, nodeId, fullTree[i][j]]) + ", "
+                    string += str([isnonleaf, nodeId, fullTree[i][j]]) + ", \n"
                 else:
                     string += str([isnonleaf, nodeId, fullTree[i][j]])
             else:
@@ -200,19 +172,15 @@ def writeRtree(fullTree):
                 if(j != len(fullTree[i])-1):
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
-                            string += str([nodeid, fullTree[i][j][k][2]]) + ", "
+                            string += str([fullTree[i][j][k][1], fullTree[i][j][k][2]]) + ", "
                         else:
-                            string += str([nodeid, fullTree[i][j][k][2]])
-                        nodeid += 1
-                    string += "]],"
+                            string += str([fullTree[i][j][k][1], fullTree[i][j][k][2]]) + "]],\n"
                 else:
                     for k in range(0, len(fullTree[i][j])):
                         if(k != len(fullTree[i][j])-1):
-                            string += str([nodeid, fullTree[i][j][k][2]]) + ", "
+                            string += str([fullTree[i][j][k][1], fullTree[i][j][k][2]]) + ", "
                         else:
-                            string += str([nodeid, fullTree[i][j][k][2]])
-                        nodeid += 1
-                    string += "]]"
+                            string += str([fullTree[i][j][k][1], fullTree[i][j][k][2]]) + "]]"
             nodeId += 1
         if(i != len(fullTree)-1):
             string += ",\n"
@@ -247,14 +215,6 @@ for i in offset_list:
             flag = 1
     if(flag):
         objects.append([int(i.split(',')[0]), objTemp])
-    
-#######✅ OBJECTS CREATION
-#######✅ MBR SINGLE CALCULATION
-#######✅ MBR MULTIPLE CALCULATION
-#######✅ calcZOrder    -- TODO: CHECK IF ID IS NEEDED
-#######✅ sortMBR FULL method
-
-#drawPlot(objects[1000])
 
 sortedMBR = sortMBR(objects)
 leaves = create(sortedMBR, 0) #0 for Leaves
