@@ -7,13 +7,11 @@ def dist(q, point):
     if(point == 0 or q == 0):
         return float('inf')
         
-   # print(q)
     center = [(point[1][0]+point[1][1])/2, (point[1][2]+point[1][3])/2]
     
     dx = q[0] - center[0]
     dy = q[1] - center[1]
     distance = math.sqrt(dx**2 + dy**2)
-    #print(distance)
     return distance
 
 def bf_nn(q, node, R):
