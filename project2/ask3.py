@@ -14,7 +14,7 @@ def dist(q, point):
     distance = math.sqrt(dx**2 + dy**2)
     return distance
 
-def bf_nn(q, node, R):
+def bf_nn(q, node, k):
     queue = []
     Onn = 0
 
@@ -25,6 +25,8 @@ def bf_nn(q, node, R):
     found = []
 
     while(len(queue) != 0):  #and dist(q,top[2]) < dist(q, Onn)):
+        queue = sorted(queue)
+        queue.reverse()
         e = heapq.heappop(queue)
             
         if(e[1] == 1):
@@ -41,7 +43,7 @@ def bf_nn(q, node, R):
             if(dist(q,o) < dist(q, Onn)):
                 Onn = o
 
-    return found
+    return sorted(found)[0:k]
     
 
 if(len(sys.argv) <= 3 or len(sys.argv) > 4):
@@ -55,7 +57,7 @@ else:
         NNqueries_file = open(sys.argv[2], "r") #offsets.txt
         NNqueries_list = [s.rstrip() for s in NNqueries_file.readlines()]
         
-        k = sys.argv[3]
+        k = int(sys.argv[3])
     except:
         print("Could not read file/s\nPlease check the validity of your input files.")
         exit()
@@ -64,16 +66,13 @@ NNqueries = []
 for i in NNqueries_list:   ## turn strings to floats, put them inside a list
     NNqueries.append([float(x) for x in i.split()])
 
-toSort = []
-sorteda = []
 qoueue = []
 
-for i in range(0,1):
-    qoueue = sorted(bf_nn(NNqueries[i], Rtree[527], 10))
+for i in range(0,len(NNqueries)):
+    qoueue = bf_nn(NNqueries[i], Rtree[527], k)
     print(i, end=": ")
     for j in range(0,len(qoueue)):
-        if j < int(k):
+        if j < len(qoueue)-1:
             print(qoueue[j][2][0], end=", ")
         else:
-            print()
-            break
+            print(qoueue[j][2][0])
