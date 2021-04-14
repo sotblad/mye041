@@ -41,7 +41,7 @@ def calcZOrder(lst): # lst = calculateMBR output
     id = 0
     for i in lst:
         x , y = ((i[0]+i[1])/2) , ((i[2]+i[3])/2)
-        result.append([pm.interleave_latlng(x,y), [id, i]])
+        result.append([pm.interleave_latlng(y,x), [id, i]])
         id += 1
     
     return result # [center z-order, [id, MBR]]
