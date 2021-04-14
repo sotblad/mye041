@@ -52,27 +52,18 @@ def sortMBR(lst):
     result = sorted(ZorderList, key=lambda x: x[0])
     return result
     
-def create(leaves, mode): # 0 for leaves, 1 for level 1
+def create(leaves):
     layer = []
     realLayer = []
     
-    result = []
-    if(mode == 1):
-        for i in range(0, len(leaves)):
-            result.append(toNormalMBR(leaves[i]))
-    else:
-        result = leaves
+    result = leaves
         
-    isnotleaf = 1
     count = 0
     maxPerLeaf = 20
     clean = 0
-    realLayerFinal=[]
+
     for i in range(0, len(result)):
-        if(mode == 1):
-            layer.append([isnotleaf, i, result[i]]) # TODO: PAKETARE SE 20DES
-        else:
-            layer.append(leaves[i][1])
+        layer.append(leaves[i][1])
         count += 1
         
         if(count == maxPerLeaf):
@@ -94,13 +85,7 @@ def create(leaves, mode): # 0 for leaves, 1 for level 1
             clean = 0
             layer = []
         
-    if(mode == 1):
-        realLayerFinal.append(leaves)
-        realLayerFinal.append(realLayer)
-
-        return realLayerFinal
-    else:
-        return realLayer
+    return realLayer
     
     
 def finishUp(lst):
@@ -108,6 +93,7 @@ def finishUp(lst):
     
     counter = 0
     nodeNum = 0
+    mode = 1
     while(len(lst[len(lst)-1]) != 1):
         layer = []
         realLayer = []
@@ -118,11 +104,19 @@ def finishUp(lst):
         realLayerFinal=[]
         
         result = []
-        for i in range(0, len(lst[len(lst)-1])):
-            result.append(toNormalMBR2(lst[len(lst)-1][i]))
+        
+        if(mode == 1):
+            for i in range(0, len(lst)):
+                result.append(toNormalMBR(lst[i]))
+        else:
+            for i in range(0, len(lst[len(lst)-1])):
+                result.append(toNormalMBR2(lst[len(lst)-1][i]))
 
         for i in range(0, len(result)):
-            layer.append([isnotleaf, nodeNum+lst[len(lst)-1][len(lst[len(lst)-1])-1][len(lst[len(lst)-1][len(lst[len(lst)-1])-1])-1][1]+1, result[i]]) # TODO: PAKETARE SE 20DES
+            if(mode == 1):
+                layer.append([isnotleaf, i, result[i]])
+            else:
+                layer.append([isnotleaf, nodeNum+lst[len(lst)-1][len(lst[len(lst)-1])-1][len(lst[len(lst)-1][len(lst[len(lst)-1])-1])-1][1]+1, result[i]])
             count += 1
             if(count == maxPerLeaf):
                 count = 0;
@@ -144,11 +138,17 @@ def finishUp(lst):
                 clean = 0
                 layer = []
             nodeNum += 1
+
         nodeNum = 0
-        realLayerFinal.append(realLayer)
-        counter += 1
-        
-        lst.append(realLayerFinal[0])
+        if(mode == 1):
+            realLayerFinal.append(leaves)
+            realLayerFinal.append(realLayer)
+            lst = realLayerFinal
+            mode = 0
+        else:
+            realLayerFinal.append(realLayer)
+            lst.append(realLayerFinal[0])
+            counter += 1
     
     return lst
     
@@ -217,9 +217,8 @@ for i in offset_list:
         objects.append([int(i.split(',')[0]), objTemp])
 
 sortedMBR = sortMBR(objects)
-leaves = create(sortedMBR, 0) #0 for Leaves
-firstSecondLayer = create(leaves, 1) # 1 for 1st layer
-fullTree = finishUp(firstSecondLayer) # continue
+leaves = create(sortedMBR) # create the leaves
+fullTree = finishUp(leaves) # create the tree from the root
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
