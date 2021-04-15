@@ -14,36 +14,31 @@ def dist(q, point):
     distance = math.sqrt(dx**2 + dy**2)
     return distance
 
-def bf_nn(q, node, k):
-    queue = []
-    Onn = 0
-
-    for i in range(0,len(node[2])):
-        heapq.heappush(queue,[dist(q, node[2][i]), node[0],node[2][i]])
+def bf_nn_search(q, R):
+    Q = []
+    counter = 0
+    for i in range(0,len(R[len(R)-1][2])):
+        heapq.heappush(Q,[dist(q, R[len(R)-1][2][i]), R[len(R)-1][0],R[len(R)-1][2][i]])
         
-    top = queue[0]
-    found = []
+    result = []
+    while(len(Q) != 0):
+        result.append(get_next_bf_nn_search(q,Q))
+        counter += 1
+    return sorted(result[0:len(result)-1])[0:k]
 
-    while(len(queue) != 0):  #and dist(q,top[2]) < dist(q, Onn)):
-        queue = sorted(queue)
-        queue.reverse()
-        e = heapq.heappop(queue)
+def get_next_bf_nn_search(q, Q):
+    while(len(Q) != 0):
+        e = heapq.heappop(Q)
             
         if(e[1] == 1):
             n = Rtree[e[2][0]]
+                
             for i in range(0,len(n[2])):
-                if(dist(q,n[2][i]) < dist(q, Onn)):
-                    heapq.heappush(queue,[dist(q, n[2][i]), n[0], n[2][i]])
-
+                heapq.heappush(Q,[dist(q, n[2][i]), n[0], n[2][i]])
         elif(e[1] == 0):
             o = e[2]
-            if(e not in found):
-                found.append(e)
-                
-            if(dist(q,o) < dist(q, Onn)):
-                Onn = o
-
-    return sorted(found)[0:k]
+            Q.append(o)
+            return e
     
 
 if(len(sys.argv) <= 3 or len(sys.argv) > 4):
@@ -69,7 +64,7 @@ for i in NNqueries_list:   ## turn strings to floats, put them inside a list
 qoueue = []
 
 for i in range(0,len(NNqueries)):
-    qoueue = bf_nn(NNqueries[i], Rtree[527], k)
+    qoueue = bf_nn_search(NNqueries[i],Rtree)
     print(i, end=": ")
     for j in range(0,len(qoueue)):
         if j < len(qoueue)-1:
