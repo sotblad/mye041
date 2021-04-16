@@ -4,27 +4,48 @@ import heapq
 import math
 
 def dist(q, point):
-    if(point == 0 or q == 0):
-        return float('inf')
-        
-    center = [(point[1][0]+point[1][1])/2, (point[1][2]+point[1][3])/2]
-    
-    dx = q[0] - center[0]
-    dy = q[1] - center[1]
+    dx = q[0] - point[0]
+    dy = q[1] - point[1]
     distance = math.sqrt(dx**2 + dy**2)
     return distance
+    
+def calc_dist(point, rectangle):
+    rectangle = rectangle[1]
+    left = point[0] < rectangle[0]
+    right = point[0] > rectangle[1]
+    bottom = point[1] < rectangle[2]
+    top = point[1] > rectangle[3]
+    
+    if top and left:
+        return dist(point, [rectangle[0], rectangle[3]])
+    elif left and bottom:
+        return dist(point, [rectangle[0], rectangle[2]])
+    elif bottom and right:
+        return dist(point, [rectangle[1], rectangle[2]])
+    elif right and top:
+        return dist(point, [rectangle[1], rectangle[3]])
+    elif left:
+        return rectangle[0] - point[0]
+    elif right:
+        return point[0] - rectangle[1]
+    elif bottom:
+        return rectangle[2] - point[1]
+    elif top:
+        return point[1] - rectangle[3]
+    else:
+        return 0
 
 def bf_nn_search(q, R):
     Q = []
     counter = 0
     for i in range(0,len(R[len(R)-1][2])):
-        heapq.heappush(Q,[dist(q, R[len(R)-1][2][i]), R[len(R)-1][0],R[len(R)-1][2][i]])
+        heapq.heappush(Q,[calc_dist(q, R[len(R)-1][2][i]), R[len(R)-1][0],R[len(R)-1][2][i]])
         
     result = []
-    while(len(Q) != 0):
+    while(len(Q) != 0 and counter < k):
         result.append(get_next_bf_nn_search(q,Q))
         counter += 1
-    return sorted(result[0:len(result)-1])[0:k]
+    return result
 
 def get_next_bf_nn_search(q, Q):
     while(len(Q) != 0):
@@ -34,10 +55,11 @@ def get_next_bf_nn_search(q, Q):
             n = Rtree[e[2][0]]
                 
             for i in range(0,len(n[2])):
-                heapq.heappush(Q,[dist(q, n[2][i]), n[0], n[2][i]])
+                heapq.heappush(Q,[calc_dist(q, n[2][i]), n[0], n[2][i]])
         elif(e[1] == 0):
             o = e[2]
-            Q.append(o)
+            heapq.heappush(Q,[calc_dist(q, e[2]), 3, o])
+        elif(e[1] == 3):
             return e
     
 
