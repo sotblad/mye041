@@ -60,6 +60,7 @@ def create(leaves):
         
     count = 0
     maxPerLeaf = 20
+    minPerLeaf = maxPerLeaf*0.4
     clean = 0
 
     for i in range(0, len(result)):
@@ -72,13 +73,17 @@ def create(leaves):
             clean = 1
             
         if(i == len(result)-1): # LAST LEAF
-            if(len(layer) < maxPerLeaf*0.4):
-                theloume = int(maxPerLeaf*0.4-len(layer))
+            if(len(layer) < minPerLeaf):
+                theloume = int(minPerLeaf-len(layer))
 
                 proigoumeno = realLayer[len(realLayer)-1][int(len(realLayer[len(realLayer)-1])-theloume):len(realLayer[len(realLayer)-1])]
                 realLayer[len(realLayer)-1] = realLayer[len(realLayer)-1][0:int(len(realLayer[len(realLayer)-1])-theloume)]
                 
                 layer = proigoumeno+layer
+            if(len(realLayer) != 0):
+                if(layer != realLayer[len(realLayer)-1]):
+                    realLayer.append(layer)
+            else:
                 realLayer.append(layer)
             
         if(clean == 1):
@@ -100,6 +105,7 @@ def finishUp(lst):
         isnotleaf = 1
         count = 0
         maxPerLeaf = 20
+        minPerLeaf = maxPerLeaf*0.4
         clean = 0
         realLayerFinal=[]
         
@@ -123,15 +129,20 @@ def finishUp(lst):
                 realLayer.append(layer)
                 clean = 1
                 
-            if(i == len(result)-1): # LAST LEAF
-                if(len(layer) < maxPerLeaf*0.4):
-                    theloume = int(maxPerLeaf*0.4-len(layer))
-                    
+            if(i == len(result)-1): # LAST
+                if(len(layer) < minPerLeaf):
+                    theloume = int(minPerLeaf-len(layer))
+
                     if(len(realLayer) != 0):
                         proigoumeno = realLayer[len(realLayer)-1][int(len(realLayer[len(realLayer)-1])-theloume):len(realLayer[len(realLayer)-1])]
                         realLayer[len(realLayer)-1] = realLayer[len(realLayer)-1][0:int(len(realLayer[len(realLayer)-1])-theloume)]
                         
                         layer = proigoumeno+layer
+
+                if(len(realLayer) != 0):
+                    if(layer != realLayer[len(realLayer)-1]):
+                        realLayer.append(layer)
+                else:
                     realLayer.append(layer)
                     
             if(clean == 1):
