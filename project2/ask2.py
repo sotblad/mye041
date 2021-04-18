@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 import sys
 import json
 
@@ -20,10 +22,10 @@ if(len(sys.argv) <= 2 or len(sys.argv) > 3):
     exit()
 else:
     try:
-        Rtree_file = open(sys.argv[1], "r") #coords.txt
+        Rtree_file = open(sys.argv[1], "r") #Rtree.txt
         Rtree = json.loads(Rtree_file.read())
 
-        queries_file = open(sys.argv[2], "r") #offsets.txt
+        queries_file = open(sys.argv[2], "r") #Rqueries.txt
         queries_list = [s.rstrip() for s in queries_file.readlines()]
     except:
         print("Could not read file/s\nPlease check the validity of your input files.")
