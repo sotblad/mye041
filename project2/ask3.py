@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 import sys
 import json
 import heapq
@@ -68,10 +70,10 @@ if(len(sys.argv) <= 3 or len(sys.argv) > 4):
     exit()
 else:
     try:
-        Rtree_file = open(sys.argv[1], "r") #coords.txt
+        Rtree_file = open(sys.argv[1], "r") #Rtree.txt
         Rtree = json.loads(Rtree_file.read())
 
-        NNqueries_file = open(sys.argv[2], "r") #offsets.txt
+        NNqueries_file = open(sys.argv[2], "r") #NNqueries.txt
         NNqueries_list = [s.rstrip() for s in NNqueries_file.readlines()]
         
         k = int(sys.argv[3])
@@ -83,13 +85,12 @@ NNqueries = []
 for i in NNqueries_list:   ## turn strings to floats, put them inside a list
     NNqueries.append([float(x) for x in i.split()])
 
-qoueue = []
 
 for i in range(0,len(NNqueries)):
-    qoueue = bf_nn_search(NNqueries[i],Rtree)
+    resultList = bf_nn_search(NNqueries[i],Rtree)
     print(i, end=": ")
-    for j in range(0,len(qoueue)):
-        if j < len(qoueue)-1:
-            print(qoueue[j][2][0], end=", ")
+    for j in range(0,len(resultList)):
+        if j < len(resultList)-1:
+            print(resultList[j][2][0], end=", ")
         else:
-            print(qoueue[j][2][0])
+            print(resultList[j][2][0])
