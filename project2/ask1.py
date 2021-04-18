@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 import sys
 import pymorton as pm
 
@@ -229,7 +231,7 @@ for i in offset_list:
 
 sortedMBR = sortMBR(objects)
 leaves = create(sortedMBR) # create the leaves
-fullTree = finishUp(leaves) # create the tree from the root
+fullTree = finishUp(leaves) # create the tree from the leaves to the root
 
 for i in range(0, len(fullTree)):
     print(len(fullTree[i]), ("nodes" if len(fullTree[i]) != 1 else "node"), "at level", i)
