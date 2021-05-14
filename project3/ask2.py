@@ -9,7 +9,7 @@ def dist(nodeA, nodeB):
     return math.sqrt((data[nodeB][1]-data[nodeA][1])**2 + (data[nodeB][2]-data[nodeA][2])**2)
 
 def dijkstra(graph, src, goal):
-    counter = 0
+    global counter
     nodes = []
     tmpDict = {}
     for n in graph:
@@ -27,6 +27,7 @@ def dijkstra(graph, src, goal):
     dist[src] = 0
 
     while q:
+        counter += 1
         u = min(q, key=dist.get)
         q.remove(u)
 
@@ -36,13 +37,12 @@ def dijkstra(graph, src, goal):
         for v, w in graph[u][1]:
             alt = dist[u] + w
             if alt < dist[v]:
-                counter += 1
                 tmpDict[u] = dist[u]
                 tmpDict[v] = alt
                 dist[v] = alt
                 prev[v] = u
                 
-    return dist, prev
+    return tmpDict
 
 
 cnode_file = open("cal.cnode.txt", "r") #cal.cnode.txt
@@ -79,9 +79,11 @@ else:
     sourceNode = int(sys.argv[1])
     targetNode = int(sys.argv[2])
     
+counter = 0
 tmpDict = dijkstra(graph,sourceNode,targetNode)
 
 for key, value in dict(sorted(tmpDict.items(), key=lambda item: item[1])).items() :
     print("dist: " + str(value) + " to: " + str(key))
     if(key == targetNode):
         break
+print(counter)
