@@ -43,6 +43,11 @@ def dijkstra(graph, src, goal):
                 prev[v] = u
                 
     return tmpDict
+    
+def Astar(graph, src, goal):
+    print("ASTARRRR")
+    return tmpDict
+
 
 
 cnode_file = open("cal.cnode.txt", "r") #cal.cnode.txt
@@ -80,10 +85,15 @@ else:
     targetNode = int(sys.argv[2])
     
 counter = 0
+print("~~~~~~~~~~~~~")
 tmpDict = dijkstra(graph,sourceNode,targetNode)
 
 for key, value in dict(sorted(tmpDict.items(), key=lambda item: item[1])).items() :
     print("dist: " + str(value) + " to: " + str(key))
     if(key == targetNode):
         break
-print(counter)
+print("Dijkstra iterations:", counter)
+print("~~~~~~~~~~~~~")
+
+
+Astar(graph, sourceNode, targetNode)
