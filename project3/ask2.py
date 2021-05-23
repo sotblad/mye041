@@ -10,6 +10,7 @@ def dist(nodeA, nodeB):
 
 def dijkstra(graph, src, goal):
     global counter
+    global distance
     nodes = []
     tmpDict = {}
     for n in graph:
@@ -19,7 +20,7 @@ def dijkstra(graph, src, goal):
     q = set(nodes)
     nodes = list(q)
     dist = dict()
-    prev = dict()
+    
     for n in nodes:
         dist[n] = float('inf')
         prev[n] = None
@@ -31,8 +32,12 @@ def dijkstra(graph, src, goal):
         u = min(q, key=dist.get)
         q.remove(u)
 
+        distance = dist[u]
+
+        if(u not in path):
+            path.append(u)
         if u == goal:
-            return tmpDict
+            return path
 
         for v, w in graph[u][1]:
             alt = dist[u] + w
@@ -42,11 +47,11 @@ def dijkstra(graph, src, goal):
                 dist[v] = alt
                 prev[v] = u
                 
-    return tmpDict
+    return path
     
 def Astar(graph, src, goal):
-    print("ASTARRRR")
-    return tmpDict
+ #   print(graph)
+    print()
 
 
 
@@ -85,15 +90,33 @@ else:
     targetNode = int(sys.argv[2])
     
 counter = 0
+path = []
+prev = dict()
+print("Dijkstra")
 print("~~~~~~~~~~~~~")
+
 tmpDict = dijkstra(graph,sourceNode,targetNode)
 
-for key, value in dict(sorted(tmpDict.items(), key=lambda item: item[1])).items() :
-    print("dist: " + str(value) + " to: " + str(key))
-    if(key == targetNode):
-        break
-print("Dijkstra iterations:", counter)
-print("~~~~~~~~~~~~~")
 
+S = []
+u = targetNode
+
+while(prev[u] is not None):
+    S.append(u)
+    u = prev[u]
+S.append(sourceNode)
+print("Distance:", distance)
+print("Dijkstra iterations:", counter)
+print("Path:" , list(reversed(S)))
+print("~~~~~~~~~~~~~")
+print("ASTARRRR")
 
 Astar(graph, sourceNode, targetNode)
+print("~~~~~~~~~~~~~")
+
+#tmpDict = dijkstra(graph,sourceNode,targetNode)
+
+#print("Distance:", distance)
+#print("Dijkstra iterations:", counter)
+#print(path)
+print("~~~~~~~~~~~~~")
