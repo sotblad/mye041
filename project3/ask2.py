@@ -86,8 +86,6 @@ def Astar(graph, src, goal):
                 
     return [prev, counter, distance]
 
-
-
 cnode_file = open("cal.cnode.txt", "r") #cal.cnode.txt
 cnode = [list(map(float,s.split())) for s in cnode_file.readlines()]
 
