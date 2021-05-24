@@ -122,6 +122,7 @@ else:
     sourceNode = int(sys.argv[1])
     targetNode = int(sys.argv[2])
  
+## Dijkstra
 S = []
 u = targetNode  
 
@@ -137,10 +138,7 @@ print("Dijkstra iterations:", path[1])
 print("Path:" , list(reversed(S)))
 print("~~~~~~~~~~~~~\n")
 
-
-
-
-
+## A Star
 S = []
 u = targetNode
 
