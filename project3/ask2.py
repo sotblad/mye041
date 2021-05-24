@@ -5,14 +5,13 @@ def chunks(l, n):
     n = max(1, n)
     return ([l[x:x+n] for x in range(0, len(l), n)])
 
-def dist(nodeA, nodeB):
-    return math.sqrt((data[nodeB][1]-data[nodeA][1])**2 + (data[nodeB][2]-data[nodeA][2])**2)
+def calcDist(nodeA, nodeB):
+    return math.sqrt((cnode[nodeB][1]-cnode[nodeA][1])**2 + (cnode[nodeB][2]-cnode[nodeA][2])**2)
 
 def dijkstra(graph, src, goal):
     global counter
     global distance
     nodes = []
-    tmpDict = {}
     for n in graph:
         nodes.append(n[0])
         nodes += [g[0] for g in graph[n[0]][1]]
@@ -42,16 +41,54 @@ def dijkstra(graph, src, goal):
         for v, w in graph[u][1]:
             alt = dist[u] + w
             if alt < dist[v]:
-                tmpDict[u] = dist[u]
-                tmpDict[v] = alt
                 dist[v] = alt
                 prev[v] = u
                 
     return path
     
 def Astar(graph, src, goal):
- #   print(graph)
-    print()
+    global counter
+    global distance
+    nodes = []
+    for n in graph:
+        nodes.append(n[0])
+        nodes += [g[0] for g in graph[n[0]][1]]
+
+    q = set(nodes)
+    nodes = list(q)
+    dist = dict()
+    distnc = dict()
+    
+
+    print(nodes[0])
+    for n in nodes:
+        dist[n] = float('inf')
+        distnc[n] = float('inf')
+        prev[n] = None
+
+    dist[src] = 0
+    distnc[src] = 0
+
+    while q:
+        counter += 1
+        u = min(q, key=dist.get)
+        q.remove(u)
+
+        distance = distnc[u]
+
+        if(u not in path):
+            path.append(u)
+        if u == goal:
+            return path
+
+        for v, w in graph[u][1]:
+            alt = dist[u] + w + calcDist(v,goal) - calcDist(u,goal)
+            if alt < dist[v]:
+                distnc[v] = distnc[u] + w
+                dist[v] = alt
+                prev[v] = u
+                
+    return path
 
 
 
@@ -71,6 +108,7 @@ for i in range(0,len(cedge)):
     diction[cedge[i][1]] = diction.get(cedge[i][1]) + [int(cedge[i][2]), cedge[i][3]]
     diction[cedge[i][2]] = diction.get(cedge[i][2]) + [int(cedge[i][1]), cedge[i][3]]
     
+print(cnode[0])
 graph = []
 for i in range(0,len(diction)):
     tempList = diction.get(i)
@@ -109,14 +147,25 @@ print("Distance:", distance)
 print("Dijkstra iterations:", counter)
 print("Path:" , list(reversed(S)))
 print("~~~~~~~~~~~~~")
-print("ASTARRRR")
-
-Astar(graph, sourceNode, targetNode)
 print("~~~~~~~~~~~~~")
 
-#tmpDict = dijkstra(graph,sourceNode,targetNode)
 
-#print("Distance:", distance)
-#print("Dijkstra iterations:", counter)
-#print(path)
+
+
+
+
+print("A*")
+
+
+counter = 0
+path = []
+prev = dict()
+Astar(graph, sourceNode, targetNode)
+while(prev[u] is not None):
+    S.append(u)
+    u = prev[u]
+print("~~~~~~~~~~~~~")
+print("Distance:", distance)
+print("A* iterations:", counter)
+print("Path:" , list(reversed(S)))
 print("~~~~~~~~~~~~~")
