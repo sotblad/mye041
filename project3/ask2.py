@@ -9,8 +9,9 @@ def calcDist(nodeA, nodeB):
     return math.sqrt((cnode[nodeB][1]-cnode[nodeA][1])**2 + (cnode[nodeB][2]-cnode[nodeA][2])**2)
 
 def dijkstra(graph, src, goal):
-    global counter
-    global distance
+    counter = 0
+    distance = 0
+    prev = dict() 
     nodes = []
     for n in graph:
         nodes.append(n[0])
@@ -33,10 +34,8 @@ def dijkstra(graph, src, goal):
 
         distance = dist[u]
 
-        if(u not in path):
-            path.append(u)
         if u == goal:
-            return path
+            return [prev, counter, distance]
 
         for v, w in graph[u][1]:
             alt = dist[u] + w
@@ -44,11 +43,12 @@ def dijkstra(graph, src, goal):
                 dist[v] = alt
                 prev[v] = u
                 
-    return path
+    return [prev, counter, distance]
     
 def Astar(graph, src, goal):
-    global counter
-    global distance
+    counter = 0
+    distance = 0
+    prev = dict() 
     nodes = []
     for n in graph:
         nodes.append(n[0])
@@ -59,8 +59,6 @@ def Astar(graph, src, goal):
     dist = dict()
     distnc = dict()
     
-
-    print(nodes[0])
     for n in nodes:
         dist[n] = float('inf')
         distnc[n] = float('inf')
@@ -76,10 +74,8 @@ def Astar(graph, src, goal):
 
         distance = distnc[u]
 
-        if(u not in path):
-            path.append(u)
         if u == goal:
-            return path
+            return [prev, counter, distance]
 
         for v, w in graph[u][1]:
             alt = dist[u] + w + calcDist(v,goal) - calcDist(u,goal)
@@ -88,7 +84,7 @@ def Astar(graph, src, goal):
                 dist[v] = alt
                 prev[v] = u
                 
-    return path
+    return [prev, counter, distance]
 
 
 
@@ -108,7 +104,6 @@ for i in range(0,len(cedge)):
     diction[cedge[i][1]] = diction.get(cedge[i][1]) + [int(cedge[i][2]), cedge[i][3]]
     diction[cedge[i][2]] = diction.get(cedge[i][2]) + [int(cedge[i][1]), cedge[i][3]]
     
-print(cnode[0])
 graph = []
 for i in range(0,len(diction)):
     tempList = diction.get(i)
@@ -126,46 +121,37 @@ if(len(sys.argv) <= 2 or len(sys.argv) > 3):
 else:
     sourceNode = int(sys.argv[1])
     targetNode = int(sys.argv[2])
-    
-counter = 0
-path = []
-prev = dict()
-print("Dijkstra")
-print("~~~~~~~~~~~~~")
+ 
+S = []
+u = targetNode  
 
-tmpDict = dijkstra(graph,sourceNode,targetNode)
+print("Dijkstra Algorithm")
+print("~~~~~~~~~~~~~")
+path = dijkstra(graph,sourceNode,targetNode)
+while(path[0][u] is not None):
+    S.append(u)
+    u = path[0][u]
+S.append(sourceNode)
+print("Distance:", path[2])
+print("Dijkstra iterations:", path[1])
+print("Path:" , list(reversed(S)))
+print("~~~~~~~~~~~~~\n")
+
+
+
 
 
 S = []
 u = targetNode
 
-while(prev[u] is not None):
+print("A* Algorithm")
+print("~~~~~~~~~~~~~")
+path = Astar(graph, sourceNode, targetNode)
+while(path[0][u] is not None):
     S.append(u)
-    u = prev[u]
+    u = path[0][u]
 S.append(sourceNode)
-print("Distance:", distance)
-print("Dijkstra iterations:", counter)
-print("Path:" , list(reversed(S)))
-print("~~~~~~~~~~~~~")
-print("~~~~~~~~~~~~~")
-
-
-
-
-
-
-print("A*")
-
-
-counter = 0
-path = []
-prev = dict()
-Astar(graph, sourceNode, targetNode)
-while(prev[u] is not None):
-    S.append(u)
-    u = prev[u]
-print("~~~~~~~~~~~~~")
-print("Distance:", distance)
-print("A* iterations:", counter)
+print("Distance:", path[2])
+print("A* iterations:", path[1])
 print("Path:" , list(reversed(S)))
 print("~~~~~~~~~~~~~")
