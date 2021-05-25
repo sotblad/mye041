@@ -124,30 +124,28 @@ else:
 S = []
 u = targetNode  
 
-print("Dijkstra Algorithm")
-print("~~~~~~~~~~~~~")
+print("Dijkstra:")
 path = dijkstra(graph,sourceNode,targetNode)
 while(path[0][u] is not None):
     S.append(u)
     u = path[0][u]
 S.append(sourceNode)
-print("Distance:", path[2])
-print("Dijkstra iterations:", path[1])
-print("Path:" , list(reversed(S)))
-print("~~~~~~~~~~~~~\n")
+print("Shortest path length =", len(S))
+print("Shortest path distance =", path[2])
+print("Shortest path =" , list(reversed(S)))
+print("number of visited nodes =", path[1], "\n")
 
 ## A Star
 S = []
 u = targetNode
 
-print("A* Algorithm")
-print("~~~~~~~~~~~~~")
+print("Astar:")
 path = Astar(graph, sourceNode, targetNode)
 while(path[0][u] is not None):
     S.append(u)
     u = path[0][u]
 S.append(sourceNode)
-print("Distance:", path[2])
-print("A* iterations:", path[1])
-print("Path:" , list(reversed(S)))
-print("~~~~~~~~~~~~~")
+print("Shortest path length =", len(S))
+print("Shortest path distance =", path[2])
+print("Shortest path =" , list(reversed(S)))
+print("number of visited nodes =", path[1])
