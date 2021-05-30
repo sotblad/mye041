@@ -1,24 +1,10 @@
 import sys
-import math
 
 def chunks(l, n):
     n = max(1, n)
     return ([l[x:x+n] for x in range(0, len(l), n)])
 
-def calcDist(nodeA, nodeB):
-    return math.sqrt((cnode[nodeB][1]-cnode[nodeA][1])**2 + (cnode[nodeB][2]-cnode[nodeA][2])**2)
-
-def gamma(gammaList):
-    maximum = -1
-    maxIndex = 0
-    for i in range(0,len(gammaList)):
-        if(gammaList[i] > maximum):
-            maximum = gammaList[i]
-            maxIndex = i
-
-    return [maximum,i]
-
-def dijkstra(graph, src, goal):
+def dijkstra(graph, src, goal=-1):
     counter = 0
     distance = 0
     prev = dict() 
@@ -44,7 +30,7 @@ def dijkstra(graph, src, goal):
 
         distance = dist[u]
 
-        if u == goal:
+        if goal != -1 and u == goal:
             return [prev, counter, distance]
 
         for v, w in graph[u][1]:
@@ -53,7 +39,7 @@ def dijkstra(graph, src, goal):
                 dist[v] = alt
                 prev[v] = u
                 
-    return [prev, counter, distance]
+    return [prev, counter, {k: v for k, v in sorted(dist.items(), key=lambda item: item[1])}]
 
 cnode_file = open("cal.cnode.txt", "r") #cal.cnode.txt
 cnode = [list(map(float,s.split())) for s in cnode_file.readlines()]
@@ -83,54 +69,35 @@ for i in range(0,len(diction)):
     graph.append(inList)
 
 if(len(sys.argv) <= 2):
-    print("Invalid Syntax\nPlease use: python ask3.py node1 node2 ..")
+    print("Invalid Syntax\nPlease use: python ask2.py node1 node2 node3...")
     exit()
 else:
     nList = list(map(int, sys.argv[1:len(sys.argv)]))
-    print(nList)
 
-
-
-ntikt = dict()
-finished = 0
-nodis = []
-nodist = []
-curr = 6
+tmpList = []
 
 for i in nList:
-    nodis.append([i])
-    nodist.append(0)
+    tmpList.append(dijkstra(graph,i))
 
-print(nodist)
-print(dijkstra(graph,6,1)[2])
+resultDict = {}
+for i in range(0,len(graph)):
+    lst = [i, []]
+    for j in range(0,len(nList)):
+        lst[1].append(tmpList[j][2][i])
+    resultDict[lst[0]] = max(lst[1])
 
-while(finished != 1):
-    gama = gamma(nodist)
-    print("GAMMA", gama)
-    for i in range(0,len(nodis)):
-        mina = 9999999999999999
-        minIndex = -1
+bestMeetingPoint = min(resultDict, key=resultDict.get)
 
-        for j in chunks(diction[nodis[i][len(nodis[i])-1]],2):
-            if(j[0] in nodis[i]):
-                continue
-            DIK = dijkstra(graph,nodis[i][0],j[1])
-            if(DIK[2] < mina):
-                mina = DIK[2]
-                minIndex = j[0]
-        existsCount = 0
-        for j in nodis:
-            if(minIndex in j):
-                existsCount += 1
-        if(existsCount == len(nodis)-1):
-            finished = 1
+print("best meeting point:", bestMeetingPoint)
+print("Shortest path distance =", resultDict[bestMeetingPoint])
+print("paths:")
 
-
-
-        nodis[i].append(minIndex)
-        ntikt[nodis[i][len(nodis[i])-1]] = minIndex
-        nodist[i] += mina
-
-    #    print("DIJKSTRA", dijkstra(graph,nodis[i][0],nodis[i][len(nodis[i])-1])[2])
-    print(nodist)
-    print(nodis)
+for i in nList:
+    S = []
+    u = bestMeetingPoint
+    path = dijkstra(graph, i, bestMeetingPoint)
+    while(path[0][u] is not None):
+        S.append(u)
+        u = path[0][u]
+    S.append(i)
+    print([path[2], list(reversed(S))])
