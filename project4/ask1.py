@@ -2,7 +2,7 @@ import sys
 import json
 import time
 
-def naive(q):
+def naive(q, disp):
 	start_time = time.time()
 	tmpDict = {}
 	tmp = []
@@ -13,23 +13,39 @@ def naive(q):
 			tmpDict[baseDict[queries_list[q][i]][j]] += 1
 			if(tmpDict[baseDict[queries_list[q][i]][j]] == len(queries_list[q])):
 				tmp.append(baseDict[queries_list[q][i]][j])
-	print("Naive Method result:")
-	print(tmp)
+	if(disp == 1):
+		print("Naive Method result:")
+		print(tmp)
 	print("Naive Method computation time =", (time.time() - start_time), "seconds")
 
-def signature(q):
+def signature(q, disp):
 	start_time = time.time()
-	print("Signature File result:")
+	for i in range(0,1):
+		bitTmpList = []
+		sortedQuery = sorted(queries_list[i])
+		bitTmpList = [0]*(sortedQuery[len(sortedQuery)-1]+1)
+		for j in range(0,len(queries_list[i])):
+			bitTmpList[queries_list[i][j]] = 1
+		bitNum = bin(int(''.join(str(e) for e in bitTmpList[::-1]), 2))
+		print(bitNum)
+	for i in range(0,len(sigfile)):
+		print(sigfile[i])
+
+
+	if(disp == 1):
+		print("Signature File result:")
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
 
-def bitsliced(q):
+def bitsliced(q, disp):
 	start_time = time.time()
-	print("Bitsliced Signature File result:")
+	if(disp == 1):
+		print("Bitsliced Signature File result:")
 	print("Bitsliced Signature File computation time =", (time.time() - start_time), "seconds")
 
-def inverted(q):
+def inverted(q, disp):
 	start_time = time.time()
-	print("Inverted File result:")
+	if(disp == 1):
+		print("Inverted File result:")
 	print("Inverted File Computation time =", (time.time() - start_time), "seconds")
 
 if(len(sys.argv) <= 4 or len(sys.argv) > 5):
@@ -58,16 +74,32 @@ for i in range(0,len(transactions_list)):
 		if(i not in baseDict.get(transactions_list[i][j])):
 			baseDict[transactions_list[i][j]] = baseDict.get(transactions_list[i][j]) + [i]
 
+sigfile = []
+for i in range(0,len(transactions_list)):
+	bitTmpList = []
+	sortedTx = sorted(transactions_list[i])
+	bitTmpList = [0]*(sortedTx[len(sortedTx)-1]+1)
+	for j in range(0,len(transactions_list[i])):
+		bitTmpList[transactions_list[i][j]] = 1
+	bitNum = ''.join(str(e) for e in bitTmpList[::-1])
+	sigfile.append(bin(int(bitNum, 2)))
+
+#print(sigfile)
+
+
 if(method == 0):
-	naive(qnum)
+	naive(qnum,1)
 elif(method == 1):
-	signature(qnum)
+	signature(qnum,1)
 elif(method == 2):
-	bitsliced(qnum)
+	bitsliced(qnum,1)
 elif(method == 3):
-	inverted(qnum)
+	inverted(qnum,1)
 elif(method == -1):
-	naive(qnum)
-	signature(qnum)
-	bitsliced(qnum)
-	inverted(qnum)
+	dispFlag = 1
+	if(qnum == -1):
+		dispFlag = 0
+	naive(qnum,dispFlag)
+	signature(qnum,dispFlag)
+	bitsliced(qnum,dispFlag)
+	inverted(qnum,dispFlag)
