@@ -20,20 +20,27 @@ def naive(q, disp):
 
 def signature(q, disp):
 	start_time = time.time()
-	for i in range(0,1):
-		bitTmpList = []
-		sortedQuery = sorted(queries_list[i])
-		bitTmpList = [0]*(sortedQuery[len(sortedQuery)-1]+1)
-		for j in range(0,len(queries_list[i])):
-			bitTmpList[queries_list[i][j]] = 1
-		bitNum = bin(int(''.join(str(e) for e in bitTmpList[::-1]), 2))
-		print(bitNum)
-	for i in range(0,len(sigfile)):
-		print(sigfile[i])
+	tmp = []
+	bitTmpList = []
+	sortedQuery = sorted(queries_list[q])
+	bitTmpList = [0]*(sortedQuery[len(sortedQuery)-1]+1)
+	for i in range(0,len(queries_list[q])):
+		bitTmpList[queries_list[q][i]] = 1
+	bitNum = ''.join(str(e) for e in bitTmpList[::-1])
 
+	writeSigfile = ""
+	for i in range(0,len(sigfile)):
+		writeSigfile += str(int(sigfile[i],2)) + "\n"
+		if((int(sigfile[i],2) & int(bitNum,2)) == int(bitNum,2)):
+			tmp.append(i)
+		
+	f = open("sigfile.txt", "w")
+	f.write(writeSigfile)
+	f.close()
 
 	if(disp == 1):
 		print("Signature File result:")
+		print(tmp)
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
 
 def bitsliced(q, disp):
@@ -82,7 +89,7 @@ for i in range(0,len(transactions_list)):
 	for j in range(0,len(transactions_list[i])):
 		bitTmpList[transactions_list[i][j]] = 1
 	bitNum = ''.join(str(e) for e in bitTmpList[::-1])
-	sigfile.append(bin(int(bitNum, 2)))
+	sigfile.append(bitNum)
 
 #print(sigfile)
 
