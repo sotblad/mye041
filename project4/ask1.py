@@ -20,6 +20,17 @@ def naive(q, disp):
 
 def signature(q, disp):
 	start_time = time.time()
+
+	sigfile = []
+	for i in range(0,len(transactions_list)):
+		bitTmpList = []
+		sortedTx = sorted(transactions_list[i])
+		bitTmpList = [0]*(sortedTx[len(sortedTx)-1]+1)
+		for j in range(0,len(transactions_list[i])):
+			bitTmpList[transactions_list[i][j]] = 1
+		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
+		sigfile.append(bitNum)
+
 	tmp = []
 	bitTmpList = []
 	sortedQuery = sorted(queries_list[q])
@@ -45,14 +56,72 @@ def signature(q, disp):
 
 def bitsliced(q, disp):
 	start_time = time.time()
+
+	writeBitSlice = ""
+
+	bitslice = []
+	for i in sorted(baseDict):
+		bitTmpList = []
+		sortedTx = sorted(baseDict[i])
+		bitTmpList = [0]*(sortedTx[len(sortedTx)-1]+1)
+		for j in range(0,len(baseDict[i])):
+			bitTmpList[baseDict[i][j]] = 1
+		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
+		bitslice.append(bitNum)
+		writeBitSlice += str(i) + ": " + str(int(bitNum,2)) + "\n"
+
+	tmp = []
+	
+	andList = []
+	for i in queries_list[q]:
+		andList.append(int(bitslice[i],2))
+
+	for i in range(0,len(andList)-1):
+		if(i == 0):
+			res = andList[i] & andList[i+1]
+		else:
+			res &= andList[i+1]
+
+	lst = list(str(bin(res))[2:])
+	lst.reverse()
+	for i in range(0,len(lst)):
+		if(int(lst[i]) == 1):
+			tmp.append(i)
+
+	f = open("bitslice.txt", "w")
+	f.write(writeBitSlice)
+	f.close()
+
 	if(disp == 1):
 		print("Bitsliced Signature File result:")
+		print(tmp)
 	print("Bitsliced Signature File computation time =", (time.time() - start_time), "seconds")
 
 def inverted(q, disp):
 	start_time = time.time()
+
+	writeInvFile = ""
+	for i in range(0,len(baseDict)):
+		if(baseDict.get(i)):
+			writeInvFile += str(i) + ": " + str(baseDict.get(i)) + "\n"
+		
+	f = open("invfile.txt", "w")
+	f.write(writeInvFile)
+	f.close()
+
+	itList = []
+	for i in queries_list[q]:
+		itList.append(baseDict[i])
+
+	for i in range(0,len(itList)-1):
+		if(i == 0):
+			res = set(itList[i]) & set(itList[i+1])
+		else:
+			res &= set(itList[i+1])
+
 	if(disp == 1):
 		print("Inverted File result:")
+		print(res)
 	print("Inverted File Computation time =", (time.time() - start_time), "seconds")
 
 if(len(sys.argv) <= 4 or len(sys.argv) > 5):
@@ -80,19 +149,6 @@ for i in range(0,len(transactions_list)):
 			baseDict[transactions_list[i][j]] = []
 		if(i not in baseDict.get(transactions_list[i][j])):
 			baseDict[transactions_list[i][j]] = baseDict.get(transactions_list[i][j]) + [i]
-
-sigfile = []
-for i in range(0,len(transactions_list)):
-	bitTmpList = []
-	sortedTx = sorted(transactions_list[i])
-	bitTmpList = [0]*(sortedTx[len(sortedTx)-1]+1)
-	for j in range(0,len(transactions_list[i])):
-		bitTmpList[transactions_list[i][j]] = 1
-	bitNum = ''.join(str(e) for e in bitTmpList[::-1])
-	sigfile.append(bitNum)
-
-#print(sigfile)
-
 
 if(method == 0):
 	naive(qnum,1)
