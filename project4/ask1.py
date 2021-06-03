@@ -204,8 +204,10 @@ else:
 
         qnum = int(sys.argv[3])
         method = int(sys.argv[4])
+        if(qnum < -1 or method < -1):
+	        exit()
     except:
-        print("Could not read file/s\nPlease check the validity of your input files.")
+        print("Something went wrong.\nPlease recheck the inputs entered.")
         exit()
 
 transactions = []
