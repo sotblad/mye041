@@ -4,18 +4,23 @@ import time
 
 def naive(q, disp):
 	start_time = time.time()
-	tmpDict = {}
+
 	tmp = []
-	for i in range(0,len(queries_list[q])):
-		for j in range(0,len(baseDict[queries_list[q][i]])):
-			if(baseDict[queries_list[q][i]][j] not in tmpDict):
-				tmpDict[baseDict[queries_list[q][i]][j]] = 0
-			tmpDict[baseDict[queries_list[q][i]][j]] += 1
-			if(tmpDict[baseDict[queries_list[q][i]][j]] == len(queries_list[q])):
-				tmp.append(baseDict[queries_list[q][i]][j])
+	query = queries_list[q]
+
+	for i in range(0,len(transactions)):
+		counter = 0
+		checked = []
+		for j in transactions[i]:
+			if(j in query and j not in checked):
+				counter += 1
+				checked.append(j)
+			if(counter == len(queries_list[q]) and i not in tmp):
+				tmp.append(i)
+
 	if(disp == 1):
 		print("Naive Method result:")
-		print(tmp)
+		print(set(tmp))
 	print("Naive Method computation time =", (time.time() - start_time), "seconds")
 
 def signature(q, disp):
@@ -51,7 +56,7 @@ def signature(q, disp):
 
 	if(disp == 1):
 		print("Signature File result:")
-		print(tmp)
+		print(set(tmp))
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
 
 def bitsliced(q, disp):
@@ -59,13 +64,30 @@ def bitsliced(q, disp):
 
 	writeBitSlice = ""
 
+	txid = []
+	for i in range(0,len(transactions)):
+		for j in range(0,len(transactions[i])):
+			if(transactions[i][j] not in txid):
+				txid.append(transactions[i][j])
+
 	bitslice = []
-	for i in sorted(baseDict):
+
+	dictionary = dict()
+
+	for i in range(0,len(transactions_list)):
+		for j in range(0,len(transactions_list[i])):
+			if(transactions_list[i][j] not in dictionary):
+				dictionary[transactions_list[i][j]] = []
+			if(i not in dictionary.get(transactions_list[i][j])):
+				dictionary[transactions_list[i][j]] = dictionary.get(transactions_list[i][j]) + [i]
+
+	for i in sorted(dictionary):
 		bitTmpList = []
-		sortedTx = sorted(baseDict[i])
+		sortedTx = sorted(dictionary[i])
 		bitTmpList = [0]*(sortedTx[len(sortedTx)-1]+1)
-		for j in range(0,len(baseDict[i])):
-			bitTmpList[baseDict[i][j]] = 1
+		for j in range(0,len(dictionary[i])):
+			bitTmpList[dictionary[i][j]] = 1
+
 		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
 		bitslice.append(bitNum)
 		writeBitSlice += str(i) + ": " + str(int(bitNum,2)) + "\n"
@@ -94,16 +116,24 @@ def bitsliced(q, disp):
 
 	if(disp == 1):
 		print("Bitsliced Signature File result:")
-		print(tmp)
+		print(set(tmp))
 	print("Bitsliced Signature File computation time =", (time.time() - start_time), "seconds")
 
 def inverted(q, disp):
 	start_time = time.time()
+	invfile = dict()
+
+	for i in range(0,len(transactions_list)):
+		for j in range(0,len(transactions_list[i])):
+			if(transactions_list[i][j] not in invfile):
+				invfile[transactions_list[i][j]] = []
+			if(i not in invfile.get(transactions_list[i][j])):
+				invfile[transactions_list[i][j]] = invfile.get(transactions_list[i][j]) + [i]
 
 	writeInvFile = ""
-	for i in range(0,len(baseDict)):
-		if(baseDict.get(i)):
-			writeInvFile += str(i) + ": " + str(baseDict.get(i)) + "\n"
+	for i in range(0,len(invfile)):
+		if(invfile.get(i)):
+			writeInvFile += str(i) + ": " + str(invfile.get(i)) + "\n"
 		
 	f = open("invfile.txt", "w")
 	f.write(writeInvFile)
@@ -111,7 +141,7 @@ def inverted(q, disp):
 
 	itList = []
 	for i in queries_list[q]:
-		itList.append(baseDict[i])
+		itList.append(invfile[i])
 
 	for i in range(0,len(itList)-1):
 		if(i == 0):
@@ -129,8 +159,8 @@ if(len(sys.argv) <= 4 or len(sys.argv) > 5):
     exit()
 else:
     try:
-        transactions = open(sys.argv[1], "r") #transactions.txt
-        transactions_list = [json.loads(s.rstrip()) for s in transactions.readlines()]
+        transactionsFile = open(sys.argv[1], "r") #transactions.txt
+        transactions_list = [json.loads(s.rstrip()) for s in transactionsFile.readlines()]
 
         queries = open(sys.argv[2], "r") #queries.txt
         queries_list = [json.loads(s.rstrip()) for s in queries.readlines()]
@@ -141,15 +171,11 @@ else:
         print("Could not read file/s\nPlease check the validity of your input files.")
         exit()
 
-baseDict = dict()
-
+transactions = []
 for i in range(0,len(transactions_list)):
-	for j in range(0,len(transactions_list[i])):
-		if(transactions_list[i][j] not in baseDict):
-			baseDict[transactions_list[i][j]] = []
-		if(i not in baseDict.get(transactions_list[i][j])):
-			baseDict[transactions_list[i][j]] = baseDict.get(transactions_list[i][j]) + [i]
+	transactions.append(transactions_list[i])
 
+#print(transactions[0])
 if(method == 0):
 	naive(qnum,1)
 elif(method == 1):
