@@ -6,19 +6,26 @@ def naive(q, disp):
 	start_time = time.time()
 
 	tmp = []
-	query = queries_list[q]
+	todoQueries = []
+	if(q != -1):
+		query = queries_list[q]
+		todoQueries.append(query)
+	else:
+		for i in queries_list:
+			todoQueries.append(i)
 
-	for i in range(0,len(transactions)):
-		counter = 0
-		checked = []
-		for j in transactions[i]:
-			if(j in query and j not in checked):
-				counter += 1
-				checked.append(j)
-			if(counter == len(queries_list[q]) and i not in tmp):
-				tmp.append(i)
+	for k in range(0,len(todoQueries)):
+		for i in range(0,len(transactions)):
+			counter = 0
+			checked = []
+			for j in transactions[i]:
+				if(j in todoQueries[k] and j not in checked):
+					counter += 1
+					checked.append(j)
+				if(counter == len(queries_list[k]) and i not in tmp):
+					tmp.append(i)
 
-	if(disp == 1):
+	if(disp == 1 and q != -1):
 		print("Naive Method result:")
 		print(set(tmp))
 	print("Naive Method computation time =", (time.time() - start_time), "seconds")
@@ -36,25 +43,36 @@ def signature(q, disp):
 		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
 		sigfile.append(bitNum)
 
-	tmp = []
-	bitTmpList = []
-	sortedQuery = sorted(queries_list[q])
-	bitTmpList = [0]*(sortedQuery[len(sortedQuery)-1]+1)
-	for i in range(0,len(queries_list[q])):
-		bitTmpList[queries_list[q][i]] = 1
-	bitNum = ''.join(str(e) for e in bitTmpList[::-1])
+	todoQueries = []
+	if(q != -1):
+		query = queries_list[q]
+		todoQueries.append(query)
+	else:
+		for i in queries_list:
+			todoQueries.append(i)
+
+	for k in range(0,len(todoQueries)):
+		tmp = []
+		bitTmpList = []
+		sortedQuery = sorted(todoQueries[k])
+		bitTmpList = [0]*(sortedQuery[len(sortedQuery)-1]+1)
+		for i in range(0,len(todoQueries[k])):
+			bitTmpList[todoQueries[k][i]] = 1
+		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
+
+		for i in range(0,len(sigfile)):
+				if((int(sigfile[i],2) & int(bitNum,2)) == int(bitNum,2)):
+					tmp.append(i)
 
 	writeSigfile = ""
 	for i in range(0,len(sigfile)):
 		writeSigfile += str(int(sigfile[i],2)) + "\n"
-		if((int(sigfile[i],2) & int(bitNum,2)) == int(bitNum,2)):
-			tmp.append(i)
-		
+	
 	f = open("sigfile.txt", "w")
 	f.write(writeSigfile)
 	f.close()
 
-	if(disp == 1):
+	if(disp == 1 and q != -1):
 		print("Signature File result:")
 		print(set(tmp))
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
@@ -92,29 +110,39 @@ def bitsliced(q, disp):
 		bitslice.append(bitNum)
 		writeBitSlice += str(i) + ": " + str(int(bitNum,2)) + "\n"
 
-	tmp = []
 	
-	andList = []
-	for i in queries_list[q]:
-		andList.append(int(bitslice[i],2))
 
-	for i in range(0,len(andList)-1):
-		if(i == 0):
-			res = andList[i] & andList[i+1]
-		else:
-			res &= andList[i+1]
+	todoQueries = []
+	if(q != -1):
+		query = queries_list[q]
+		todoQueries.append(query)
+	else:
+		for i in queries_list:
+			todoQueries.append(i)
 
-	lst = list(str(bin(res))[2:])
-	lst.reverse()
-	for i in range(0,len(lst)):
-		if(int(lst[i]) == 1):
-			tmp.append(i)
+	for k in range(0,len(todoQueries)):
+		tmp = []
+		andList = []
+		for i in todoQueries[k]:
+			andList.append(int(bitslice[i],2))
+
+		for i in range(0,len(andList)-1):
+			if(i == 0):
+				res = andList[i] & andList[i+1]
+			else:
+				res &= andList[i+1]
+
+		lst = list(str(bin(res))[2:])
+		lst.reverse()
+		for i in range(0,len(lst)):
+			if(int(lst[i]) == 1):
+				tmp.append(i)
 
 	f = open("bitslice.txt", "w")
 	f.write(writeBitSlice)
 	f.close()
 
-	if(disp == 1):
+	if(disp == 1 and q != -1):
 		print("Bitsliced Signature File result:")
 		print(set(tmp))
 	print("Bitsliced Signature File computation time =", (time.time() - start_time), "seconds")
@@ -139,17 +167,26 @@ def inverted(q, disp):
 	f.write(writeInvFile)
 	f.close()
 
-	itList = []
-	for i in queries_list[q]:
-		itList.append(invfile[i])
+	todoQueries = []
+	if(q != -1):
+		query = queries_list[q]
+		todoQueries.append(query)
+	else:
+		for i in queries_list:
+			todoQueries.append(i)
 
-	for i in range(0,len(itList)-1):
-		if(i == 0):
-			res = set(itList[i]) & set(itList[i+1])
-		else:
-			res &= set(itList[i+1])
+	for k in range(0,len(todoQueries)):
+		itList = []
+		for i in todoQueries[k]:
+			itList.append(invfile[i])
 
-	if(disp == 1):
+		for i in range(0,len(itList)-1):
+			if(i == 0):
+				res = set(itList[i]) & set(itList[i+1])
+			else:
+				res &= set(itList[i+1])
+
+	if(disp == 1 and q != -1):
 		print("Inverted File result:")
 		print(res)
 	print("Inverted File Computation time =", (time.time() - start_time), "seconds")
@@ -175,7 +212,6 @@ transactions = []
 for i in range(0,len(transactions_list)):
 	transactions.append(transactions_list[i])
 
-#print(transactions[0])
 if(method == 0):
 	naive(qnum,1)
 elif(method == 1):
