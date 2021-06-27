@@ -2,6 +2,24 @@ import sys
 import json
 import time
 
+def mergeInter(lst1,lst2):
+	result = []
+	t1 = 0
+	t2 = 0
+
+	while(len(lst1) > t1 and len(lst2) > t2):
+		if(lst1[t1] and lst2[t2]):
+			if(lst1[t1] < lst2[t2]):
+				t1 += 1
+			elif(lst1[t1] > lst2[t2]):
+				t2 += 1
+			else:
+				result.append(lst1[t1])
+				t1 += 1
+				t2 += 1
+
+	return result
+
 def naive(q, disp):
 	domi = []
 	for i in transactions:
@@ -64,32 +82,23 @@ def signature(q, disp):
 				if((int(sigfile[i],2) & int(bitNum,2)) == int(bitNum,2)):
 					tmp.append(i)
 
-	writeSigfile = ""
-	for i in range(0,len(sigfile)):
-		writeSigfile += str(int(sigfile[i],2)) + "\n"
-
 	if(disp == 1 and q != -1):
 		print("Signature File result:")
 		print(set(tmp))
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
+
+	writeSigfile = ""
+	for i in range(0,len(sigfile)):
+		writeSigfile += str(int(sigfile[i],2)) + "\n"
 
 	f = open("sigfile.txt", "w")
 	f.write(writeSigfile)
 	f.close()
 
 def bitsliced(q, disp):
-	start_time = time.time()
 
 	writeBitSlice = ""
-
-	txid = []
-	for i in range(0,len(transactions)):
-		for j in range(0,len(transactions[i])):
-			if(transactions[i][j] not in txid):
-				txid.append(transactions[i][j])
-
 	bitslice = []
-
 	dictionary = dict()
 
 	for i in range(0,len(transactions_list)):
@@ -110,7 +119,7 @@ def bitsliced(q, disp):
 		bitslice.append(bitNum)
 		writeBitSlice += str(i) + ": " + str(int(bitNum,2)) + "\n"
 
-	
+	start_time = time.time()
 
 	todoQueries = []
 	if(q != -1):
@@ -138,17 +147,17 @@ def bitsliced(q, disp):
 			if(int(lst[i]) == 1):
 				tmp.append(i)
 
-	f = open("bitslice.txt", "w")
-	f.write(writeBitSlice)
-	f.close()
-
 	if(disp == 1 and q != -1):
 		print("Bitsliced Signature File result:")
 		print(set(tmp))
 	print("Bitsliced Signature File computation time =", (time.time() - start_time), "seconds")
 
+	f = open("bitslice.txt", "w")
+	f.write(writeBitSlice)
+	f.close()
+
 def inverted(q, disp):
-	start_time = time.time()
+
 	invfile = dict()
 
 	for i in range(0,len(transactions_list)):
@@ -167,6 +176,8 @@ def inverted(q, disp):
 	f.write(writeInvFile)
 	f.close()
 
+	start_time = time.time()
+
 	todoQueries = []
 	if(q != -1):
 		query = queries_list[q]
@@ -182,13 +193,13 @@ def inverted(q, disp):
 
 		for i in range(0,len(itList)-1):
 			if(i == 0):
-				res = set(itList[i]) & set(itList[i+1])
+				res = set(itList[i]) & set(itList[i+1]) # mergeInter(itList[i],itList[i+1])
 			else:
-				res &= set(itList[i+1])
+				res = res & set(itList[i+1]) # mergeInter(res,itList[i+1])
 
 	if(disp == 1 and q != -1):
 		print("Inverted File result:")
-		print(res)
+		print(set(res))
 	print("Inverted File Computation time =", (time.time() - start_time), "seconds")
 
 if(len(sys.argv) <= 4 or len(sys.argv) > 5):
