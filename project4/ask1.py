@@ -3,6 +3,10 @@ import json
 import time
 
 def naive(q, disp):
+	domi = []
+	for i in transactions:
+		domi.append(i)
+
 	start_time = time.time()
 
 	tmp = []
@@ -15,15 +19,10 @@ def naive(q, disp):
 			todoQueries.append(i)
 
 	for k in range(0,len(todoQueries)):
-		for i in range(0,len(transactions)):
-			counter = 0
-			checked = []
-			for j in transactions[i]:
-				if(j in todoQueries[k] and j not in checked):
-					counter += 1
-					checked.append(j)
-				if(counter == len(queries_list[k]) and i not in tmp):
-					tmp.append(i)
+		for i in range(0,len(domi)):
+			inter = set(domi[i]).intersection(todoQueries[k])
+			if(len(inter) == len(todoQueries[k])):
+				tmp.append(i)
 
 	if(disp == 1 and q != -1):
 		print("Naive Method result:")
@@ -31,7 +30,6 @@ def naive(q, disp):
 	print("Naive Method computation time =", (time.time() - start_time), "seconds")
 
 def signature(q, disp):
-	start_time = time.time()
 
 	sigfile = []
 	for i in range(0,len(transactions_list)):
@@ -42,6 +40,8 @@ def signature(q, disp):
 			bitTmpList[transactions_list[i][j]] = 1
 		bitNum = ''.join(str(e) for e in bitTmpList[::-1])
 		sigfile.append(bitNum)
+
+	start_time = time.time()
 
 	todoQueries = []
 	if(q != -1):
@@ -67,15 +67,15 @@ def signature(q, disp):
 	writeSigfile = ""
 	for i in range(0,len(sigfile)):
 		writeSigfile += str(int(sigfile[i],2)) + "\n"
-	
-	f = open("sigfile.txt", "w")
-	f.write(writeSigfile)
-	f.close()
 
 	if(disp == 1 and q != -1):
 		print("Signature File result:")
 		print(set(tmp))
 	print("Signature File computation time =", (time.time() - start_time), "seconds")
+
+	f = open("sigfile.txt", "w")
+	f.write(writeSigfile)
+	f.close()
 
 def bitsliced(q, disp):
 	start_time = time.time()
