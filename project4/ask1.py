@@ -1,3 +1,5 @@
+#Sotirios Panagiotou, 4456
+
 import sys
 import json
 import time
@@ -195,11 +197,11 @@ def inverted(q, disp):
 			if(i == 0):
 				res = set(itList[i]) & set(itList[i+1]) # mergeInter(itList[i],itList[i+1])
 			else:
-				res = res & set(itList[i+1]) # mergeInter(res,itList[i+1])
+				res &= set(itList[i+1]) # mergeInter(res,itList[i+1])
 
 	if(disp == 1 and q != -1):
 		print("Inverted File result:")
-		print(set(res))
+		print(res)
 	print("Inverted File Computation time =", (time.time() - start_time), "seconds")
 
 if(len(sys.argv) <= 4 or len(sys.argv) > 5):
